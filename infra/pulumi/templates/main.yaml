@@ -1,0 +1,59 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Infraestructura de asistencia con plantillas anidadas
+
+Parameters:
+  KeyName: 
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Nombre de un par de claves EC2 existente
+    Default: CLAVES
+
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Description: AMI de Amazon Linux 2023 x86-64
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+
+  SshCidr: 
+    Type: String
+    Description: IP pública autorizada para SSH, en formato CIDR
+    Default: 189.28.75.140/32
+    AllowedPattern: '^([0-9]{1,3}\.){3}[0-9]{1,3}/32$'
+
+Resources:
+  RedStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://cf-templates-1fw6k0datadmr-us-east-1.s3.us-east-1.amazonaws.com/templates/red.yaml
+      TimeoutInMinutes: 10
+
+  SeguridadStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://cf-templates-1fw6k0datadmr-us-east-1.s3.us-east-1.amazonaws.com/templates/seguridad.yaml
+      Parameters:
+        VpcId: !GetAtt RedStack.Outputs.VpcId
+        SshCidr: !Ref SshCidr
+      TimeoutInMinutes: 10
+
+  ServidoresStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://cf-templates-1fw6k0datadmr-us-east-1.s3.us-east-1.amazonaws.com/templates/servidores.yaml
+      Parameters:
+        SubnetId: !GetAtt RedStack.Outputs.SubnetId
+        FrontendSecurityGroupId: !GetAtt SeguridadStack.Outputs.FrontendSecurityGroupId
+        BackendSecurityGroupId: !GetAtt SeguridadStack.Outputs.BackendSecurityGroupId
+        KeyName: !Ref KeyName
+        AmiId: !Ref LatestAmiId
+      TimeoutInMinutes: 15
+
+Outputs:
+  VpcId:
+    Description: ID de la VPC creada por la plantilla de red
+    Value: !GetAtt RedStack.Outputs.VpcId
+
+  FrontendInstanceId:
+    Value: !GetAtt ServidoresStack.Outputs.FrontendInstanceId
+
+  BackendInstanceId:
+    Value: !GetAtt ServidoresStack.Outputs.BackendInstanceId

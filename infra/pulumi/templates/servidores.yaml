@@ -1,0 +1,59 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Servidores nuevos para el proyecto de asistencia
+
+Parameters:
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+
+  FrontendSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+
+  BackendSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+
+  AmiId:
+    Type: AWS::EC2::Image::Id
+
+Resources:
+  FrontendInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: t3.micro
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - DeviceIndex: '0'
+          AssociatePublicIpAddress: true
+          SubnetId: !Ref SubnetId
+          GroupSet:
+            - !Ref FrontendSecurityGroupId
+      Tags:
+        - Key: Name
+          Value: asistencia-frontend-nuevo
+
+  BackendInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: t3.micro
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - DeviceIndex: '0'
+          AssociatePublicIpAddress: true
+          SubnetId: !Ref SubnetId
+          GroupSet:
+            - !Ref BackendSecurityGroupId
+      Tags:
+        - Key: Name
+          Value: asistencia-backend-nuevo
+
+Outputs:
+  FrontendInstanceId:
+    Value: !Ref FrontendInstance
+
+  BackendInstanceId:
+    Value: !Ref BackendInstance

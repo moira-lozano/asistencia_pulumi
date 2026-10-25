@@ -1,0 +1,746 @@
+{
+    "version": 3,
+    "deployment": {
+        "manifest": {
+            "time": "2026-10-25T11:37:20.6898537-04:00",
+            "magic": "da41b6ba6f541b05210422a0c7a5cfe6366a0dd710a1faefa2cbf79e60134d0b",
+            "version": "v3.270.0"
+        },
+        "secrets_providers": {
+            "type": "passphrase",
+            "state": {
+                "salt": "v1:+Ndr3JHgoGg=:v1:LvKtQPiKQmfJGr+D:MD7KHp7d2/rzwUmU+ez5mXlh124prQ=="
+            }
+        },
+        "resources": [
+            {
+                "urn": "urn:pulumi:dev::asistencia-infra::pulumi:pulumi:Stack::asistencia-infra-dev",
+                "custom": false,
+                "type": "pulumi:pulumi:Stack",
+                "outputs": {
+                    "servers": {
+                        "backend": {
+                            "id": "i-0709dc12e57c36214",
+                            "private_ip": "10.0.1.134",
+                            "public_ip": "3.222.215.5"
+                        },
+                        "client": {
+                            "id": "i-021e80f0aada3727b",
+                            "private_ip": "10.0.0.52",
+                            "public_dns": "",
+                            "public_ip": "44.213.134.85"
+                        }
+                    },
+                    "ssh_commands": {
+                        "backend": "ssh ec2-user@3.222.215.5",
+                        "client": "ssh ec2-user@44.213.134.85"
+                    }
+                },
+                "created": "2026-10-25T15:09:08.5700404Z",
+                "modified": "2026-10-25T15:09:08.5700404Z"
+            },
+            {
+                "urn": "urn:pulumi:dev::asistencia-infra::pulumi:providers:aws::default_7_51_1",
+                "custom": true,
+                "id": "c37df56c-6c11-4806-a4df-fb9c54840ba0",
+                "type": "pulumi:providers:aws",
+                "inputs": {
+                    "__internal": {},
+                    "region": "us-east-1",
+                    "skipCredentialsValidation": "false",
+                    "skipRegionValidation": "true",
+                    "version": "7.51.1"
+                },
+                "outputs": {
+                    "region": "us-east-1",
+                    "skipCredentialsValidation": "false",
+                    "skipRegionValidation": "true",
+                    "version": "7.51.1"
+                },
+                "created": "2026-10-25T15:09:14.5222952Z",
+                "modified": "2026-10-25T15:37:18.1108964Z"
+            },
+            {
+                "urn": "urn:pulumi:dev::asistencia-infra::aws:ec2/instance:Instance::srv-front",
+                "custom": true,
+                "id": "i-021e80f0aada3727b",
+                "type": "aws:ec2/instance:Instance",
+                "inputs": {
+                    "__defaults": [
+                        "sourceDestCheck"
+                    ],
+                    "ami": "ami-0b6d9d3d33ba97d99",
+                    "associatePublicIpAddress": true,
+                    "availabilityZone": "us-east-1a",
+                    "capacityReservationSpecification": {
+                        "__defaults": [],
+                        "capacityReservationPreference": "open"
+                    },
+                    "cpuOptions": {
+                        "__defaults": [],
+                        "coreCount": 1,
+                        "threadsPerCore": 2
+                    },
+                    "creditSpecification": {
+                        "__defaults": [],
+                        "cpuCredits": "unlimited"
+                    },
+                    "ebsOptimized": true,
+                    "instanceInitiatedShutdownBehavior": "stop",
+                    "instanceType": "t3.micro",
+                    "keyName": "CLAVES",
+                    "maintenanceOptions": {
+                        "__defaults": [],
+                        "autoRecovery": "default"
+                    },
+                    "metadataOptions": {
+                        "__defaults": [],
+                        "httpEndpoint": "enabled",
+                        "httpProtocolIpv6": "disabled",
+                        "httpPutResponseHopLimit": 2,
+                        "httpTokens": "required",
+                        "instanceMetadataTags": "disabled"
+                    },
+                    "privateDnsNameOptions": {
+                        "__defaults": [],
+                        "hostnameType": "ip-name"
+                    },
+                    "privateIp": "10.0.0.52",
+                    "region": "us-east-1",
+                    "rootBlockDevice": {
+                        "__defaults": [
+                            "deleteOnTermination"
+                        ],
+                        "deleteOnTermination": true,
+                        "iops": 3000,
+                        "throughput": 125,
+                        "volumeSize": 8,
+                        "volumeType": "gp3"
+                    },
+                    "sourceDestCheck": true,
+                    "subnetId": "subnet-09ba9af789798ee75",
+                    "tags": {
+                        "Name": "srv-front"
+                    },
+                    "tagsAll": {
+                        "Name": "srv-front"
+                    },
+                    "tenancy": "default",
+                    "vpcSecurityGroupIds": [
+                        "sg-0abee350eac1bd170"
+                    ]
+                },
+                "outputs": {
+                    "__meta": "{\"e2bfb730-ecaa-11e6-8f88-34363bc7c4c0\":{\"create\":600000000000,\"delete\":1200000000000,\"read\":900000000000,\"update\":600000000000},\"schema_version\":\"2\"}",
+                    "__pulumi_raw_state_delta": {
+                        "obj": {
+                            "ps": {
+                                "capacityReservationSpecification": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {
+                                                "ps": {
+                                                    "capacityReservationTarget": {
+                                                        "plu": {
+                                                            "i": {}
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "cpuOptions": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "creditSpecification": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "ebsBlockDevices": {
+                                    "arr": {}
+                                },
+                                "enclaveOptions": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "ephemeralBlockDevices": {
+                                    "arr": {}
+                                },
+                                "instanceMarketOptions": {
+                                    "plu": {
+                                        "i": {}
+                                    }
+                                },
+                                "ipv6Addresses": {
+                                    "arr": {}
+                                },
+                                "launchTemplate": {
+                                    "plu": {
+                                        "i": {}
+                                    }
+                                },
+                                "maintenanceOptions": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "metadataOptions": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "networkInterfaces": {
+                                    "arr": {}
+                                },
+                                "primaryNetworkInterface": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "privateDnsNameOptions": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "rootBlockDevice": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {
+                                                "ps": {
+                                                    "tags": {
+                                                        "map": {}
+                                                    },
+                                                    "tagsAll": {
+                                                        "map": {}
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "secondaryNetworkInterfaces": {
+                                    "arr": {}
+                                },
+                                "secondaryPrivateIps": {
+                                    "arr": {}
+                                },
+                                "securityGroups": {
+                                    "arr": {}
+                                },
+                                "tags": {
+                                    "map": {}
+                                },
+                                "tagsAll": {
+                                    "map": {}
+                                },
+                                "vpcSecurityGroupIds": {
+                                    "arr": {}
+                                }
+                            },
+                            "renamed": {
+                                "ebsBlockDevices": "ebs_block_device",
+                                "ephemeralBlockDevices": "ephemeral_block_device",
+                                "networkInterfaces": "network_interface",
+                                "secondaryNetworkInterfaces": "secondary_network_interface"
+                            }
+                        }
+                    },
+                    "ami": "ami-0b6d9d3d33ba97d99",
+                    "arn": "arn:aws:ec2:us-east-1:036900132687:instance/i-021e80f0aada3727b",
+                    "associatePublicIpAddress": true,
+                    "availabilityZone": "us-east-1a",
+                    "capacityReservationSpecification": {
+                        "capacityReservationPreference": "open",
+                        "capacityReservationTarget": null
+                    },
+                    "cpuOptions": {
+                        "amdSevSnp": "",
+                        "coreCount": 1,
+                        "nestedVirtualization": "",
+                        "threadsPerCore": 2
+                    },
+                    "creditSpecification": {
+                        "cpuCredits": "unlimited"
+                    },
+                    "disableApiStop": false,
+                    "disableApiTermination": false,
+                    "ebsBlockDevices": [],
+                    "ebsOptimized": true,
+                    "enablePrimaryIpv6": null,
+                    "enclaveOptions": {
+                        "enabled": false
+                    },
+                    "ephemeralBlockDevices": [],
+                    "forceDestroy": false,
+                    "getPasswordData": false,
+                    "hibernation": false,
+                    "hostId": "",
+                    "hostResourceGroupArn": null,
+                    "iamInstanceProfile": "",
+                    "id": "i-021e80f0aada3727b",
+                    "instanceInitiatedShutdownBehavior": "stop",
+                    "instanceLifecycle": "",
+                    "instanceMarketOptions": null,
+                    "instanceState": "running",
+                    "instanceType": "t3.micro",
+                    "ipv6AddressCount": 0,
+                    "ipv6Addresses": [],
+                    "keyName": "CLAVES",
+                    "launchTemplate": null,
+                    "maintenanceOptions": {
+                        "autoRecovery": "default"
+                    },
+                    "metadataOptions": {
+                        "httpEndpoint": "enabled",
+                        "httpProtocolIpv6": "disabled",
+                        "httpPutResponseHopLimit": 2,
+                        "httpTokens": "required",
+                        "instanceMetadataTags": "disabled"
+                    },
+                    "monitoring": false,
+                    "networkInterfaces": [],
+                    "outpostArn": "",
+                    "passwordData": "",
+                    "placementGroup": "",
+                    "placementGroupId": "",
+                    "placementPartitionNumber": 0,
+                    "primaryNetworkInterface": {
+                        "deleteOnTermination": true,
+                        "networkInterfaceId": "eni-07a79681a002b4d4c"
+                    },
+                    "primaryNetworkInterfaceId": "eni-07a79681a002b4d4c",
+                    "privateDns": "ip-10-0-0-52.ec2.internal",
+                    "privateDnsNameOptions": {
+                        "enableResourceNameDnsARecord": false,
+                        "enableResourceNameDnsAaaaRecord": false,
+                        "hostnameType": "ip-name"
+                    },
+                    "privateIp": "10.0.0.52",
+                    "publicDns": "",
+                    "publicIp": "44.213.134.85",
+                    "region": "us-east-1",
+                    "rootBlockDevice": {
+                        "deleteOnTermination": true,
+                        "deviceName": "/dev/sda1",
+                        "encrypted": false,
+                        "iops": 3000,
+                        "kmsKeyId": "",
+                        "tags": {},
+                        "tagsAll": {},
+                        "throughput": 125,
+                        "volumeId": "vol-00322829908d4c008",
+                        "volumeSize": 8,
+                        "volumeType": "gp3"
+                    },
+                    "secondaryNetworkInterfaces": [],
+                    "secondaryPrivateIps": [],
+                    "securityGroups": [],
+                    "sourceDestCheck": true,
+                    "spotInstanceRequestId": "",
+                    "subnetId": "subnet-09ba9af789798ee75",
+                    "tags": {
+                        "Name": "srv-front"
+                    },
+                    "tagsAll": {
+                        "Name": "srv-front"
+                    },
+                    "tenancy": "default",
+                    "userData": null,
+                    "userDataBase64": null,
+                    "userDataReplaceOnChange": null,
+                    "volumeTags": null,
+                    "vpcSecurityGroupIds": [
+                        "sg-0abee350eac1bd170"
+                    ]
+                },
+                "parent": "urn:pulumi:dev::asistencia-infra::pulumi:pulumi:Stack::asistencia-infra-dev",
+                "protect": true,
+                "provider": "urn:pulumi:dev::asistencia-infra::pulumi:providers:aws::default_7_51_1::c37df56c-6c11-4806-a4df-fb9c54840ba0",
+                "propertyDependencies": {
+                    "ami": [],
+                    "associatePublicIpAddress": [],
+                    "availabilityZone": [],
+                    "capacityReservationSpecification": [],
+                    "cpuOptions": [],
+                    "creditSpecification": [],
+                    "ebsOptimized": [],
+                    "instanceInitiatedShutdownBehavior": [],
+                    "instanceType": [],
+                    "keyName": [],
+                    "maintenanceOptions": [],
+                    "metadataOptions": [],
+                    "privateDnsNameOptions": [],
+                    "privateIp": [],
+                    "region": [],
+                    "rootBlockDevice": [],
+                    "subnetId": [],
+                    "tags": [],
+                    "tenancy": [],
+                    "vpcSecurityGroupIds": []
+                },
+                "created": "2026-10-25T15:09:20.5973966Z",
+                "modified": "2026-10-25T15:09:20.5973966Z"
+            },
+            {
+                "urn": "urn:pulumi:dev::asistencia-infra::aws:ec2/instance:Instance::srv-back",
+                "custom": true,
+                "id": "i-0709dc12e57c36214",
+                "type": "aws:ec2/instance:Instance",
+                "inputs": {
+                    "__defaults": [
+                        "sourceDestCheck"
+                    ],
+                    "ami": "ami-0b6d9d3d33ba97d99",
+                    "associatePublicIpAddress": true,
+                    "availabilityZone": "us-east-1a",
+                    "capacityReservationSpecification": {
+                        "__defaults": [],
+                        "capacityReservationPreference": "open"
+                    },
+                    "cpuOptions": {
+                        "__defaults": [],
+                        "coreCount": 1,
+                        "threadsPerCore": 2
+                    },
+                    "creditSpecification": {
+                        "__defaults": [],
+                        "cpuCredits": "unlimited"
+                    },
+                    "ebsOptimized": true,
+                    "instanceInitiatedShutdownBehavior": "stop",
+                    "instanceType": "t3.micro",
+                    "keyName": "CLAVES",
+                    "maintenanceOptions": {
+                        "__defaults": [],
+                        "autoRecovery": "default"
+                    },
+                    "metadataOptions": {
+                        "__defaults": [],
+                        "httpEndpoint": "enabled",
+                        "httpProtocolIpv6": "disabled",
+                        "httpPutResponseHopLimit": 2,
+                        "httpTokens": "required",
+                        "instanceMetadataTags": "disabled"
+                    },
+                    "privateDnsNameOptions": {
+                        "__defaults": [],
+                        "hostnameType": "ip-name"
+                    },
+                    "privateIp": "10.0.1.134",
+                    "region": "us-east-1",
+                    "rootBlockDevice": {
+                        "__defaults": [
+                            "deleteOnTermination"
+                        ],
+                        "deleteOnTermination": true,
+                        "iops": 3000,
+                        "throughput": 125,
+                        "volumeSize": 8,
+                        "volumeType": "gp3"
+                    },
+                    "sourceDestCheck": true,
+                    "subnetId": "subnet-09ba9af789798ee75",
+                    "tags": {
+                        "Name": "srv-back"
+                    },
+                    "tagsAll": {
+                        "Name": "srv-back"
+                    },
+                    "tenancy": "default",
+                    "vpcSecurityGroupIds": [
+                        "sg-0c8c28f2beda67529"
+                    ]
+                },
+                "outputs": {
+                    "__meta": "{\"e2bfb730-ecaa-11e6-8f88-34363bc7c4c0\":{\"create\":600000000000,\"delete\":1200000000000,\"read\":900000000000,\"update\":600000000000},\"schema_version\":\"2\"}",
+                    "__pulumi_raw_state_delta": {
+                        "obj": {
+                            "ps": {
+                                "capacityReservationSpecification": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {
+                                                "ps": {
+                                                    "capacityReservationTarget": {
+                                                        "plu": {
+                                                            "i": {}
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "cpuOptions": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "creditSpecification": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "ebsBlockDevices": {
+                                    "arr": {}
+                                },
+                                "enclaveOptions": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "ephemeralBlockDevices": {
+                                    "arr": {}
+                                },
+                                "instanceMarketOptions": {
+                                    "plu": {
+                                        "i": {}
+                                    }
+                                },
+                                "ipv6Addresses": {
+                                    "arr": {}
+                                },
+                                "launchTemplate": {
+                                    "plu": {
+                                        "i": {}
+                                    }
+                                },
+                                "maintenanceOptions": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "metadataOptions": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "networkInterfaces": {
+                                    "arr": {}
+                                },
+                                "primaryNetworkInterface": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "privateDnsNameOptions": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {}
+                                        }
+                                    }
+                                },
+                                "rootBlockDevice": {
+                                    "plu": {
+                                        "i": {
+                                            "obj": {
+                                                "ps": {
+                                                    "tags": {
+                                                        "map": {}
+                                                    },
+                                                    "tagsAll": {
+                                                        "map": {}
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "secondaryNetworkInterfaces": {
+                                    "arr": {}
+                                },
+                                "secondaryPrivateIps": {
+                                    "arr": {}
+                                },
+                                "securityGroups": {
+                                    "arr": {}
+                                },
+                                "tags": {
+                                    "map": {}
+                                },
+                                "tagsAll": {
+                                    "map": {}
+                                },
+                                "vpcSecurityGroupIds": {
+                                    "arr": {}
+                                }
+                            },
+                            "renamed": {
+                                "ebsBlockDevices": "ebs_block_device",
+                                "ephemeralBlockDevices": "ephemeral_block_device",
+                                "networkInterfaces": "network_interface",
+                                "secondaryNetworkInterfaces": "secondary_network_interface"
+                            }
+                        }
+                    },
+                    "ami": "ami-0b6d9d3d33ba97d99",
+                    "arn": "arn:aws:ec2:us-east-1:036900132687:instance/i-0709dc12e57c36214",
+                    "associatePublicIpAddress": true,
+                    "availabilityZone": "us-east-1a",
+                    "capacityReservationSpecification": {
+                        "capacityReservationPreference": "open",
+                        "capacityReservationTarget": null
+                    },
+                    "cpuOptions": {
+                        "amdSevSnp": "",
+                        "coreCount": 1,
+                        "nestedVirtualization": "",
+                        "threadsPerCore": 2
+                    },
+                    "creditSpecification": {
+                        "cpuCredits": "unlimited"
+                    },
+                    "disableApiStop": false,
+                    "disableApiTermination": false,
+                    "ebsBlockDevices": [],
+                    "ebsOptimized": true,
+                    "enablePrimaryIpv6": null,
+                    "enclaveOptions": {
+                        "enabled": false
+                    },
+                    "ephemeralBlockDevices": [],
+                    "forceDestroy": false,
+                    "getPasswordData": false,
+                    "hibernation": false,
+                    "hostId": "",
+                    "hostResourceGroupArn": null,
+                    "iamInstanceProfile": "",
+                    "id": "i-0709dc12e57c36214",
+                    "instanceInitiatedShutdownBehavior": "stop",
+                    "instanceLifecycle": "",
+                    "instanceMarketOptions": null,
+                    "instanceState": "running",
+                    "instanceType": "t3.micro",
+                    "ipv6AddressCount": 0,
+                    "ipv6Addresses": [],
+                    "keyName": "CLAVES",
+                    "launchTemplate": null,
+                    "maintenanceOptions": {
+                        "autoRecovery": "default"
+                    },
+                    "metadataOptions": {
+                        "httpEndpoint": "enabled",
+                        "httpProtocolIpv6": "disabled",
+                        "httpPutResponseHopLimit": 2,
+                        "httpTokens": "required",
+                        "instanceMetadataTags": "disabled"
+                    },
+                    "monitoring": false,
+                    "networkInterfaces": [],
+                    "outpostArn": "",
+                    "passwordData": "",
+                    "placementGroup": "",
+                    "placementGroupId": "",
+                    "placementPartitionNumber": 0,
+                    "primaryNetworkInterface": {
+                        "deleteOnTermination": true,
+                        "networkInterfaceId": "eni-0958a36a2cf66b254"
+                    },
+                    "primaryNetworkInterfaceId": "eni-0958a36a2cf66b254",
+                    "privateDns": "ip-10-0-1-134.ec2.internal",
+                    "privateDnsNameOptions": {
+                        "enableResourceNameDnsARecord": false,
+                        "enableResourceNameDnsAaaaRecord": false,
+                        "hostnameType": "ip-name"
+                    },
+                    "privateIp": "10.0.1.134",
+                    "publicDns": "",
+                    "publicIp": "3.222.215.5",
+                    "region": "us-east-1",
+                    "rootBlockDevice": {
+                        "deleteOnTermination": true,
+                        "deviceName": "/dev/sda1",
+                        "encrypted": false,
+                        "iops": 3000,
+                        "kmsKeyId": "",
+                        "tags": {},
+                        "tagsAll": {},
+                        "throughput": 125,
+                        "volumeId": "vol-0832e27401b3e298c",
+                        "volumeSize": 8,
+                        "volumeType": "gp3"
+                    },
+                    "secondaryNetworkInterfaces": [],
+                    "secondaryPrivateIps": [],
+                    "securityGroups": [],
+                    "sourceDestCheck": true,
+                    "spotInstanceRequestId": "",
+                    "subnetId": "subnet-09ba9af789798ee75",
+                    "tags": {
+                        "Name": "srv-back"
+                    },
+                    "tagsAll": {
+                        "Name": "srv-back"
+                    },
+                    "tenancy": "default",
+                    "userData": null,
+                    "userDataBase64": null,
+                    "userDataReplaceOnChange": null,
+                    "volumeTags": null,
+                    "vpcSecurityGroupIds": [
+                        "sg-0c8c28f2beda67529"
+                    ]
+                },
+                "parent": "urn:pulumi:dev::asistencia-infra::pulumi:pulumi:Stack::asistencia-infra-dev",
+                "protect": true,
+                "provider": "urn:pulumi:dev::asistencia-infra::pulumi:providers:aws::default_7_51_1::c37df56c-6c11-4806-a4df-fb9c54840ba0",
+                "propertyDependencies": {
+                    "ami": [],
+                    "associatePublicIpAddress": [],
+                    "availabilityZone": [],
+                    "capacityReservationSpecification": [],
+                    "cpuOptions": [],
+                    "creditSpecification": [],
+                    "ebsOptimized": [],
+                    "instanceInitiatedShutdownBehavior": [],
+                    "instanceType": [],
+                    "keyName": [],
+                    "maintenanceOptions": [],
+                    "metadataOptions": [],
+                    "privateDnsNameOptions": [],
+                    "privateIp": [],
+                    "region": [],
+                    "rootBlockDevice": [],
+                    "subnetId": [],
+                    "tags": [],
+                    "tenancy": [],
+                    "vpcSecurityGroupIds": []
+                },
+                "created": "2026-10-25T15:24:30.2927417Z",
+                "modified": "2026-10-25T15:24:30.2927417Z"
+            }
+        ],
+        "metadata": {}
+    }
+}

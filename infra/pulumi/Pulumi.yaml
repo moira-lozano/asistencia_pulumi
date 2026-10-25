@@ -1,0 +1,12 @@
+
+name: asistencia-infra
+runtime:
+  name: nodejs
+  options:
+    typescript: true
+description: Infraestructura AWS del proyecto Asistencia
+config:
+  aws:region: us-east-1
+backend:
+  url: s3://asistencia-tfstate-036900132687?region=us-east-1
+

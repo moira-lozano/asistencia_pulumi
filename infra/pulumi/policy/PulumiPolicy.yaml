@@ -1,0 +1,4 @@
+runtime: nodejs
+name: asistencia-seguridad
+version: 0.1.0
+description: Reglas de seguridad para la infraestructura AWS de asistencia

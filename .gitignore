@@ -13,3 +13,6 @@ coverage/
 # Claves SSH locales: nunca forman parte del repositorio
 github.key
 github.key.pub
+
+# Plantilla de importacion de recursos AWS
+infra/pulumi/asistencia-importacion.yaml

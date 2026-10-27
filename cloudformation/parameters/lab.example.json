@@ -1,0 +1,23 @@
+
+[
+  {
+    "ParameterKey": "Project",
+    "ParameterValue": "asistencia"
+  },
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "demo"
+  },
+  {
+    "ParameterKey": "SshSourceCidr",
+    "ParameterValue": "189.28.75.226/32"
+  },
+  {
+    "ParameterKey": "SshPublicKey",
+    "ParameterValue": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAXIdtIWr7W/Suji7dt3Qej0OlDwxZv4X9eDP9yRyGLD asistencia-demo-aws"
+  },
+  {
+    "ParameterKey": "LatestAmiId",
+    "ParameterValue": "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.18-x86_64"
+  }
+]

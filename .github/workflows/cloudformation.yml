@@ -1,0 +1,17 @@
+name: CloudFormation
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  TEMPLATE: cloudformation/main.yaml
+  PARAMETERS: cloudformation/parameters/lab.json
+  STACK_NAME: ${{ vars.STACK_NAME }}
+  ARTIFACT_BUCKET: ${{ vars.ARTIFACT_BUCKET }}
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "CloudFormation workflow is ready."

@@ -1,0 +1,8 @@
+# Fuerza LF: los scripts .sh fallan en GitHub Actions (Linux) si llegan con CRLF
+* text=auto
+*.yaml text eol=lf
+*.yml  text eol=lf
+*.sh   text eol=lf
+*.bicep text eol=lf
+*.bicepparam text eol=lf
+*.json text eol=lf

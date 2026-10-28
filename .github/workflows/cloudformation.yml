@@ -1,17 +1,80 @@
-name: CloudFormation
+name: cloudformation
 
+# Pull Request -> empaqueta, valida y MUESTRA el change set (no despliega).
+# Push a main  -> despliega, pero solo tras la aprobación del entorno "aws-lab".
 on:
+  pull_request:
+    paths: ['cloudformation/**', 'scripts/cfn-changeset.sh', '.github/workflows/cloudformation.yml']
+  push:
+    branches: [main]
+    paths: ['cloudformation/**', 'scripts/cfn-changeset.sh', '.github/workflows/cloudformation.yml']
   workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write   # OIDC: GitHub obtiene credenciales temporales; no se guardan claves de AWS
+
+concurrency:
+  group: cloudformation-deploy
+  cancel-in-progress: false
 
 env:
   AWS_REGION: us-east-1
-  TEMPLATE: cloudformation/main.yaml
-  PARAMETERS: cloudformation/parameters/lab.json
   STACK_NAME: ${{ vars.STACK_NAME }}
   ARTIFACT_BUCKET: ${{ vars.ARTIFACT_BUCKET }}
 
 jobs:
-  validate:
+  plan:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - run: echo "CloudFormation workflow is ready."
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Generar parametros desde variables del repositorio
+        env:
+          SSH_SOURCE_CIDR: ${{ vars.SSH_SOURCE_CIDR }}
+          SSH_PUBLIC_KEY: ${{ vars.SSH_PUBLIC_KEY }}
+          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          PROJECT: ${{ vars.PROJECT }}
+        run: |
+          : "${SSH_SOURCE_CIDR:?Falta la variable SSH_SOURCE_CIDR}" "${SSH_PUBLIC_KEY:?Falta la variable SSH_PUBLIC_KEY}"
+          jq -n --arg cidr "$SSH_SOURCE_CIDR" --arg key "$SSH_PUBLIC_KEY" \
+                --arg env "${ENVIRONMENT:-demo}" --arg proj "${PROJECT:-asistencia}" \
+            '[{ParameterKey:"SshSourceCidr",ParameterValue:$cidr},
+              {ParameterKey:"SshPublicKey",ParameterValue:$key},
+              {ParameterKey:"Environment",ParameterValue:$env},
+              {ParameterKey:"Project",ParameterValue:$proj}]' > cloudformation/parameters/lab.json
+      - name: Empaquetar, validar y mostrar cambios (sin ejecutar)
+        run: bash scripts/cfn-changeset.sh plan
+
+  apply:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: aws-lab   # configure "Required reviewers" en este entorno: es la aprobación humana
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Generar parametros desde variables del repositorio
+        env:
+          SSH_SOURCE_CIDR: ${{ vars.SSH_SOURCE_CIDR }}
+          SSH_PUBLIC_KEY: ${{ vars.SSH_PUBLIC_KEY }}
+          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          PROJECT: ${{ vars.PROJECT }}
+        run: |
+          : "${SSH_SOURCE_CIDR:?Falta la variable SSH_SOURCE_CIDR}" "${SSH_PUBLIC_KEY:?Falta la variable SSH_PUBLIC_KEY}"
+          jq -n --arg cidr "$SSH_SOURCE_CIDR" --arg key "$SSH_PUBLIC_KEY" \
+                --arg env "${ENVIRONMENT:-demo}" --arg proj "${PROJECT:-asistencia}" \
+            '[{ParameterKey:"SshSourceCidr",ParameterValue:$cidr},
+              {ParameterKey:"SshPublicKey",ParameterValue:$key},
+              {ParameterKey:"Environment",ParameterValue:$env},
+              {ParameterKey:"Project",ParameterValue:$proj}]' > cloudformation/parameters/lab.json
+      - name: Crear change set, revisar y ejecutar
+        env:
+          CONFIRM_EXECUTE: 'true'   # la aprobación del entorno aws-lab ya ocurrió
+        run: bash scripts/cfn-changeset.sh apply

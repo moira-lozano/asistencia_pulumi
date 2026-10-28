@@ -20,3 +20,6 @@ infra/pulumi/asistencia-importacion.yaml
 
 
 cloudformation/parameters/lab.json
+
+build/
+packaged.yaml

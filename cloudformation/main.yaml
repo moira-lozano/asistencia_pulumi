@@ -107,3 +107,4 @@ Outputs:
   Tags:
     - Key: Environment
       Value: Testing-GitSync
+      Description: Entorno de laboratorio para pruebas de GitSync.

@@ -1,0 +1,1081 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.48.1.52935",
+      "templateHash": "3420455891455708877"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Región de Azure. Por defecto, la del grupo de recursos."
+      }
+    },
+    "prefix": {
+      "type": "string",
+      "defaultValue": "asistencia",
+      "minLength": 2,
+      "maxLength": 12,
+      "metadata": {
+        "description": "Prefijo para nombrar los recursos."
+      }
+    },
+    "adminSourceIp": {
+      "type": "string",
+      "minLength": 9,
+      "metadata": {
+        "description": "Tu IP pública en formato CIDR /32. Es el único origen autorizado para SSH."
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "defaultValue": "azureuser",
+      "metadata": {
+        "description": "Usuario administrador de Linux."
+      }
+    },
+    "sshPublicKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Contenido de la clave PUBLICA SSH (.pub). Nunca la privada."
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_B1s",
+      "metadata": {
+        "description": "Tamaño de las VMs. Si no hay cupo en tu región/suscripción, prueba Standard_B2s."
+      }
+    },
+    "dbDataDiskSizeGB": {
+      "type": "int",
+      "defaultValue": 32,
+      "minValue": 4,
+      "metadata": {
+        "description": "Tamaño (GB) del disco de datos persistente de la base de datos."
+      }
+    }
+  },
+  "variables": {
+    "vnetCidr": "10.20.0.0/16",
+    "frontendSubnetCidr": "10.20.1.0/24",
+    "backendSubnetCidr": "10.20.2.0/24",
+    "dbSubnetCidr": "10.20.3.0/24"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "security",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          },
+          "adminSourceIp": {
+            "value": "[parameters('adminSourceIp')]"
+          },
+          "frontendSubnetCidr": {
+            "value": "[variables('frontendSubnetCidr')]"
+          },
+          "backendSubnetCidr": {
+            "value": "[variables('backendSubnetCidr')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.48.1.52935",
+              "templateHash": "2043138000211381796"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "prefix": {
+              "type": "string"
+            },
+            "adminSourceIp": {
+              "type": "string",
+              "metadata": {
+                "description": "IP pública del administrador (CIDR /32)."
+              }
+            },
+            "frontendSubnetCidr": {
+              "type": "string"
+            },
+            "backendSubnetCidr": {
+              "type": "string"
+            },
+            "backendPort": {
+              "type": "int",
+              "defaultValue": 8090
+            },
+            "dbPort": {
+              "type": "int",
+              "defaultValue": 3306
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-nsg-frontend', parameters('prefix'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "securityRules": [
+                  {
+                    "name": "allow-http-https-internet",
+                    "properties": {
+                      "priority": 100,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "Internet",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRanges": [
+                        "80",
+                        "443"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "allow-ssh-admin",
+                    "properties": {
+                      "priority": 110,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "[parameters('adminSourceIp')]",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "22"
+                    }
+                  },
+                  {
+                    "name": "deny-all-inbound",
+                    "properties": {
+                      "priority": 4096,
+                      "direction": "Inbound",
+                      "access": "Deny",
+                      "protocol": "*",
+                      "sourceAddressPrefix": "*",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "*"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-nsg-backend', parameters('prefix'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "securityRules": [
+                  {
+                    "name": "allow-api-from-frontend",
+                    "properties": {
+                      "priority": 100,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "[parameters('frontendSubnetCidr')]",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "[string(parameters('backendPort'))]"
+                    }
+                  },
+                  {
+                    "name": "allow-ssh-from-frontend",
+                    "properties": {
+                      "priority": 110,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "[parameters('frontendSubnetCidr')]",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "22"
+                    }
+                  },
+                  {
+                    "name": "deny-all-inbound",
+                    "properties": {
+                      "priority": 4096,
+                      "direction": "Inbound",
+                      "access": "Deny",
+                      "protocol": "*",
+                      "sourceAddressPrefix": "*",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "*"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-nsg-db', parameters('prefix'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "securityRules": [
+                  {
+                    "name": "allow-db-from-backend",
+                    "properties": {
+                      "priority": 100,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "[parameters('backendSubnetCidr')]",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "[string(parameters('dbPort'))]"
+                    }
+                  },
+                  {
+                    "name": "allow-ssh-from-frontend",
+                    "properties": {
+                      "priority": 110,
+                      "direction": "Inbound",
+                      "access": "Allow",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "[parameters('frontendSubnetCidr')]",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "22"
+                    }
+                  },
+                  {
+                    "name": "deny-all-inbound",
+                    "properties": {
+                      "priority": 4096,
+                      "direction": "Inbound",
+                      "access": "Deny",
+                      "protocol": "*",
+                      "sourceAddressPrefix": "*",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*",
+                      "destinationPortRange": "*"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "outputs": {
+            "frontendNsgId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-nsg-frontend', parameters('prefix')))]"
+            },
+            "backendNsgId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-nsg-backend', parameters('prefix')))]"
+            },
+            "dbNsgId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}-nsg-db', parameters('prefix')))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "network",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          },
+          "vnetCidr": {
+            "value": "[variables('vnetCidr')]"
+          },
+          "frontendSubnetCidr": {
+            "value": "[variables('frontendSubnetCidr')]"
+          },
+          "backendSubnetCidr": {
+            "value": "[variables('backendSubnetCidr')]"
+          },
+          "dbSubnetCidr": {
+            "value": "[variables('dbSubnetCidr')]"
+          },
+          "frontendNsgId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'security'), '2025-04-01').outputs.frontendNsgId.value]"
+          },
+          "backendNsgId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'security'), '2025-04-01').outputs.backendNsgId.value]"
+          },
+          "dbNsgId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'security'), '2025-04-01').outputs.dbNsgId.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.48.1.52935",
+              "templateHash": "5814430283551324365"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "prefix": {
+              "type": "string"
+            },
+            "vnetCidr": {
+              "type": "string"
+            },
+            "frontendSubnetCidr": {
+              "type": "string"
+            },
+            "backendSubnetCidr": {
+              "type": "string"
+            },
+            "dbSubnetCidr": {
+              "type": "string"
+            },
+            "frontendNsgId": {
+              "type": "string"
+            },
+            "backendNsgId": {
+              "type": "string"
+            },
+            "dbNsgId": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/publicIPAddresses",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-pip-nat', parameters('prefix'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard"
+              },
+              "properties": {
+                "publicIPAllocationMethod": "Static"
+              }
+            },
+            {
+              "type": "Microsoft.Network/natGateways",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-nat', parameters('prefix'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard"
+              },
+              "properties": {
+                "idleTimeoutInMinutes": 4,
+                "publicIpAddresses": [
+                  {
+                    "id": "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pip-nat', parameters('prefix')))]"
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pip-nat', parameters('prefix')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-vnet', parameters('prefix'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [
+                    "[parameters('vnetCidr')]"
+                  ]
+                },
+                "subnets": [
+                  {
+                    "name": "snet-frontend",
+                    "properties": {
+                      "addressPrefix": "[parameters('frontendSubnetCidr')]",
+                      "networkSecurityGroup": {
+                        "id": "[parameters('frontendNsgId')]"
+                      },
+                      "defaultOutboundAccess": false
+                    }
+                  },
+                  {
+                    "name": "snet-backend",
+                    "properties": {
+                      "addressPrefix": "[parameters('backendSubnetCidr')]",
+                      "networkSecurityGroup": {
+                        "id": "[parameters('backendNsgId')]"
+                      },
+                      "natGateway": {
+                        "id": "[resourceId('Microsoft.Network/natGateways', format('{0}-nat', parameters('prefix')))]"
+                      },
+                      "defaultOutboundAccess": false
+                    }
+                  },
+                  {
+                    "name": "snet-db",
+                    "properties": {
+                      "addressPrefix": "[parameters('dbSubnetCidr')]",
+                      "networkSecurityGroup": {
+                        "id": "[parameters('dbNsgId')]"
+                      },
+                      "natGateway": {
+                        "id": "[resourceId('Microsoft.Network/natGateways', format('{0}-nat', parameters('prefix')))]"
+                      },
+                      "defaultOutboundAccess": false
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/natGateways', format('{0}-nat', parameters('prefix')))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "frontendSubnetId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', format('{0}-vnet', parameters('prefix'))), '2024-05-01').subnets[0].id]"
+            },
+            "backendSubnetId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', format('{0}-vnet', parameters('prefix'))), '2024-05-01').subnets[1].id]"
+            },
+            "dbSubnetId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', format('{0}-vnet', parameters('prefix'))), '2024-05-01').subnets[2].id]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'security')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "vm-frontend",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[format('{0}-frontend', parameters('prefix'))]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "subnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'network'), '2025-04-01').outputs.frontendSubnetId.value]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "sshPublicKey": {
+            "value": "[parameters('sshPublicKey')]"
+          },
+          "createPublicIp": {
+            "value": true
+          },
+          "dataDiskSizeGB": {
+            "value": 0
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.48.1.52935",
+              "templateHash": "5477399591717978307"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "subnetId": {
+              "type": "string"
+            },
+            "vmSize": {
+              "type": "string"
+            },
+            "adminUsername": {
+              "type": "string"
+            },
+            "sshPublicKey": {
+              "type": "string",
+              "metadata": {
+                "description": "Clave PUBLICA SSH."
+              }
+            },
+            "createPublicIp": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "true solo para el frontend."
+              }
+            },
+            "dataDiskSizeGB": {
+              "type": "int",
+              "defaultValue": 0,
+              "metadata": {
+                "description": "0 = sin disco de datos. >0 = disco persistente separado del disco del sistema."
+              }
+            }
+          },
+          "resources": [
+            {
+              "condition": "[parameters('createPublicIp')]",
+              "type": "Microsoft.Network/publicIPAddresses",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-pip', parameters('name'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard"
+              },
+              "properties": {
+                "publicIPAllocationMethod": "Static"
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-nic', parameters('name'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "subnet": {
+                        "id": "[parameters('subnetId')]"
+                      },
+                      "privateIPAllocationMethod": "Dynamic",
+                      "publicIPAddress": "[if(parameters('createPublicIp'), createObject('id', resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pip', parameters('name')))), null())]"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pip', parameters('name')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2024-07-01",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                  "computerName": "[parameters('name')]",
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "linuxConfiguration": {
+                    "disablePasswordAuthentication": true,
+                    "ssh": {
+                      "publicKeys": [
+                        {
+                          "path": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
+                          "keyData": "[parameters('sshPublicKey')]"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "Canonical",
+                    "offer": "ubuntu-24_04-lts",
+                    "sku": "server",
+                    "version": "latest"
+                  },
+                  "osDisk": {
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "StandardSSD_LRS"
+                    }
+                  },
+                  "dataDisks": "[if(greater(parameters('dataDiskSizeGB'), 0), createArray(createObject('lun', 0, 'createOption', 'Empty', 'diskSizeGB', parameters('dataDiskSizeGB'), 'managedDisk', createObject('storageAccountType', 'StandardSSD_LRS'))), createArray())]"
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic', parameters('name')))]"
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic', parameters('name')))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "privateIp": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic', parameters('name'))), '2024-05-01').ipConfigurations[0].properties.privateIPAddress]"
+            },
+            "publicIp": {
+              "type": "string",
+              "value": "[if(parameters('createPublicIp'), reference(resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pip', parameters('name'))), '2024-05-01').ipAddress, '')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'network')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "vm-backend",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[format('{0}-backend', parameters('prefix'))]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "subnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'network'), '2025-04-01').outputs.backendSubnetId.value]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "sshPublicKey": {
+            "value": "[parameters('sshPublicKey')]"
+          },
+          "createPublicIp": {
+            "value": false
+          },
+          "dataDiskSizeGB": {
+            "value": 0
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.48.1.52935",
+              "templateHash": "5477399591717978307"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "subnetId": {
+              "type": "string"
+            },
+            "vmSize": {
+              "type": "string"
+            },
+            "adminUsername": {
+              "type": "string"
+            },
+            "sshPublicKey": {
+              "type": "string",
+              "metadata": {
+                "description": "Clave PUBLICA SSH."
+              }
+            },
+            "createPublicIp": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "true solo para el frontend."
+              }
+            },
+            "dataDiskSizeGB": {
+              "type": "int",
+              "defaultValue": 0,
+              "metadata": {
+                "description": "0 = sin disco de datos. >0 = disco persistente separado del disco del sistema."
+              }
+            }
+          },
+          "resources": [
+            {
+              "condition": "[parameters('createPublicIp')]",
+              "type": "Microsoft.Network/publicIPAddresses",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-pip', parameters('name'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard"
+              },
+              "properties": {
+                "publicIPAllocationMethod": "Static"
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-nic', parameters('name'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "subnet": {
+                        "id": "[parameters('subnetId')]"
+                      },
+                      "privateIPAllocationMethod": "Dynamic",
+                      "publicIPAddress": "[if(parameters('createPublicIp'), createObject('id', resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pip', parameters('name')))), null())]"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pip', parameters('name')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2024-07-01",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                  "computerName": "[parameters('name')]",
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "linuxConfiguration": {
+                    "disablePasswordAuthentication": true,
+                    "ssh": {
+                      "publicKeys": [
+                        {
+                          "path": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
+                          "keyData": "[parameters('sshPublicKey')]"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "Canonical",
+                    "offer": "ubuntu-24_04-lts",
+                    "sku": "server",
+                    "version": "latest"
+                  },
+                  "osDisk": {
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "StandardSSD_LRS"
+                    }
+                  },
+                  "dataDisks": "[if(greater(parameters('dataDiskSizeGB'), 0), createArray(createObject('lun', 0, 'createOption', 'Empty', 'diskSizeGB', parameters('dataDiskSizeGB'), 'managedDisk', createObject('storageAccountType', 'StandardSSD_LRS'))), createArray())]"
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic', parameters('name')))]"
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic', parameters('name')))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "privateIp": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic', parameters('name'))), '2024-05-01').ipConfigurations[0].properties.privateIPAddress]"
+            },
+            "publicIp": {
+              "type": "string",
+              "value": "[if(parameters('createPublicIp'), reference(resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pip', parameters('name'))), '2024-05-01').ipAddress, '')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'network')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "vm-database",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[format('{0}-db', parameters('prefix'))]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "subnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'network'), '2025-04-01').outputs.dbSubnetId.value]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "sshPublicKey": {
+            "value": "[parameters('sshPublicKey')]"
+          },
+          "createPublicIp": {
+            "value": false
+          },
+          "dataDiskSizeGB": {
+            "value": "[parameters('dbDataDiskSizeGB')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.48.1.52935",
+              "templateHash": "5477399591717978307"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "subnetId": {
+              "type": "string"
+            },
+            "vmSize": {
+              "type": "string"
+            },
+            "adminUsername": {
+              "type": "string"
+            },
+            "sshPublicKey": {
+              "type": "string",
+              "metadata": {
+                "description": "Clave PUBLICA SSH."
+              }
+            },
+            "createPublicIp": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "true solo para el frontend."
+              }
+            },
+            "dataDiskSizeGB": {
+              "type": "int",
+              "defaultValue": 0,
+              "metadata": {
+                "description": "0 = sin disco de datos. >0 = disco persistente separado del disco del sistema."
+              }
+            }
+          },
+          "resources": [
+            {
+              "condition": "[parameters('createPublicIp')]",
+              "type": "Microsoft.Network/publicIPAddresses",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-pip', parameters('name'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard"
+              },
+              "properties": {
+                "publicIPAllocationMethod": "Static"
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2024-05-01",
+              "name": "[format('{0}-nic', parameters('name'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "subnet": {
+                        "id": "[parameters('subnetId')]"
+                      },
+                      "privateIPAllocationMethod": "Dynamic",
+                      "publicIPAddress": "[if(parameters('createPublicIp'), createObject('id', resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pip', parameters('name')))), null())]"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pip', parameters('name')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2024-07-01",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                  "computerName": "[parameters('name')]",
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "linuxConfiguration": {
+                    "disablePasswordAuthentication": true,
+                    "ssh": {
+                      "publicKeys": [
+                        {
+                          "path": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
+                          "keyData": "[parameters('sshPublicKey')]"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "Canonical",
+                    "offer": "ubuntu-24_04-lts",
+                    "sku": "server",
+                    "version": "latest"
+                  },
+                  "osDisk": {
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "StandardSSD_LRS"
+                    }
+                  },
+                  "dataDisks": "[if(greater(parameters('dataDiskSizeGB'), 0), createArray(createObject('lun', 0, 'createOption', 'Empty', 'diskSizeGB', parameters('dataDiskSizeGB'), 'managedDisk', createObject('storageAccountType', 'StandardSSD_LRS'))), createArray())]"
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic', parameters('name')))]"
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic', parameters('name')))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "privateIp": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', format('{0}-nic', parameters('name'))), '2024-05-01').ipConfigurations[0].properties.privateIPAddress]"
+            },
+            "publicIp": {
+              "type": "string",
+              "value": "[if(parameters('createPublicIp'), reference(resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pip', parameters('name'))), '2024-05-01').ipAddress, '')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'network')]"
+      ]
+    }
+  ],
+  "outputs": {
+    "frontendPublicIp": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'vm-frontend'), '2025-04-01').outputs.publicIp.value]"
+    },
+    "frontendPrivateIp": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'vm-frontend'), '2025-04-01').outputs.privateIp.value]"
+    },
+    "backendPrivateIp": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'vm-backend'), '2025-04-01').outputs.privateIp.value]"
+    },
+    "databasePrivateIp": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'vm-database'), '2025-04-01').outputs.privateIp.value]"
+    },
+    "sshFrontend": {
+      "type": "string",
+      "value": "[format('ssh {0}@{1}', parameters('adminUsername'), reference(resourceId('Microsoft.Resources/deployments', 'vm-frontend'), '2025-04-01').outputs.publicIp.value)]"
+    },
+    "sshBackendViaFrontend": {
+      "type": "string",
+      "value": "[format('ssh -J {0}@{1} {2}@{3}', parameters('adminUsername'), reference(resourceId('Microsoft.Resources/deployments', 'vm-frontend'), '2025-04-01').outputs.publicIp.value, parameters('adminUsername'), reference(resourceId('Microsoft.Resources/deployments', 'vm-backend'), '2025-04-01').outputs.privateIp.value)]"
+    },
+    "sshDatabaseViaFrontend": {
+      "type": "string",
+      "value": "[format('ssh -J {0}@{1} {2}@{3}', parameters('adminUsername'), reference(resourceId('Microsoft.Resources/deployments', 'vm-frontend'), '2025-04-01').outputs.publicIp.value, parameters('adminUsername'), reference(resourceId('Microsoft.Resources/deployments', 'vm-database'), '2025-04-01').outputs.privateIp.value)]"
+    }
+  }
+}

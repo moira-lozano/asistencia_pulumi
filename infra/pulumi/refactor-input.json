@@ -1,0 +1,23 @@
+{
+    "Description": "",
+    "EnableStackCreation": true,
+    "ResourceMappings": [
+        {
+            "Source": {
+                "StackName": "",
+                "LogicalResourceId": ""
+            },
+            "Destination": {
+                "StackName": "",
+                "LogicalResourceId": ""
+            }
+        }
+    ],
+    "StackDefinitions": [
+        {
+            "StackName": "",
+            "TemplateBody": "",
+            "TemplateURL": ""
+        }
+    ]
+}

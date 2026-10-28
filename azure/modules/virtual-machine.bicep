@@ -103,4 +103,4 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = {
 }
 
 output privateIp string = nic.properties.ipConfigurations[0].properties.privateIPAddress
-output publicIp string = createPublicIp ? publicIp.properties.ipAddress : ''
+output publicIp string = createPublicIp ? publicIp!.properties.ipAddress : ''

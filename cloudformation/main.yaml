@@ -104,3 +104,6 @@ Outputs:
   BackendSshCommand:
     Description: SSH al backend privado mediante frontend; la clave privada permanece local.
     Value: !GetAtt ComputeStack.Outputs.BackendSshCommand
+  Tags:
+    - Key: Environment
+      Value: Testing-GitSync

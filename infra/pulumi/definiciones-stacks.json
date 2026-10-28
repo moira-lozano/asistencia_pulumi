@@ -1,0 +1,19 @@
+
+[
+  {
+    "StackName": "asistencia-importacion",
+    "TemplateURL": "https://asistencia-tfstate-036900132687.s3.us-east-1.amazonaws.com/asistencia/templates/plantilla-final.yaml"
+  },
+  {
+    "StackName": "asistencia-red",
+    "TemplateURL": "https://asistencia-tfstate-036900132687.s3.us-east-1.amazonaws.com/asistencia/templates/red.yaml"
+  },
+  {
+    "StackName": "asistencia-seguridad",
+    "TemplateURL": "https://asistencia-tfstate-036900132687.s3.us-east-1.amazonaws.com/asistencia/templates/seguridad.yaml"
+  },
+  {
+    "StackName": "asistencia-servidores",
+    "TemplateURL": "https://asistencia-tfstate-036900132687.s3.us-east-1.amazonaws.com/asistencia/templates/servidores.yaml"
+  }
+]

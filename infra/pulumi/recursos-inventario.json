@@ -1,0 +1,148 @@
+{
+    "StackResourceSummaries": [
+        {
+            "LogicalResourceId": "EC2Instance",
+            "PhysicalResourceId": "i-021e80f0aada3727b",
+            "ResourceType": "AWS::EC2::Instance",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:58.474000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2InstanceJT",
+            "PhysicalResourceId": "i-0709dc12e57c36214",
+            "ResourceType": "AWS::EC2::Instance",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:58.277000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2InternetGateway",
+            "PhysicalResourceId": "igw-0ba81df8e3f386dc7",
+            "ResourceType": "AWS::EC2::InternetGateway",
+            "LastUpdatedTimestamp": "2026-10-25T19:17:10.726000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2Route",
+            "PhysicalResourceId": "rtb-01175623d75a29107|0.0.0.0/0",
+            "ResourceType": "AWS::EC2::Route",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:54.375000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "ResourceStatusReason": "Applying stack-level tags as part of this import operation will cause a replacement of this resource, we are therefore not going to apply or update tags",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2RouteTable",
+            "PhysicalResourceId": "rtb-01175623d75a29107",
+            "ResourceType": "AWS::EC2::RouteTable",
+            "LastUpdatedTimestamp": "2026-10-25T19:17:05.476000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2SecurityGroup",
+            "PhysicalResourceId": "sg-0abee350eac1bd170",
+            "ResourceType": "AWS::EC2::SecurityGroup",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:55.702000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2SecurityGroupCR",
+            "PhysicalResourceId": "sg-0c8c28f2beda67529",
+            "ResourceType": "AWS::EC2::SecurityGroup",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:55.779000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2Subnet",
+            "PhysicalResourceId": "subnet-09ba9af789798ee75",
+            "ResourceType": "AWS::EC2::Subnet",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:55.876000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2VPC",
+            "PhysicalResourceId": "vpc-060b642494b60df97",
+            "ResourceType": "AWS::EC2::VPC",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:56.191000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2VPCGatewayAttachmentIGW",
+            "PhysicalResourceId": "vpc-060b642494b60df97|IGW",
+            "ResourceType": "AWS::EC2::VPCGatewayAttachment",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:54.397000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "ResourceStatusReason": "Applying stack-level tags as part of this import operation will cause a replacement of this resource, we are therefore not going to apply or update tags",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "NOT_CHECKED"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2Volume",
+            "PhysicalResourceId": "vol-00322829908d4c008",
+            "ResourceType": "AWS::EC2::Volume",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:56.549000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2VolumeAttachment",
+            "PhysicalResourceId": "i-021e80f0aada3727b|vol-00322829908d4c008",
+            "ResourceType": "AWS::EC2::VolumeAttachment",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:54.206000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "ResourceStatusReason": "Applying stack-level tags as part of this import operation will cause a replacement of this resource, we are therefore not going to apply or update tags",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2VolumeAttachmentCf",
+            "PhysicalResourceId": "i-0709dc12e57c36214|vol-0832e27401b3e298c",
+            "ResourceType": "AWS::EC2::VolumeAttachment",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:54.293000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "ResourceStatusReason": "Applying stack-level tags as part of this import operation will cause a replacement of this resource, we are therefore not going to apply or update tags",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        },
+        {
+            "LogicalResourceId": "EC2VolumeOU",
+            "PhysicalResourceId": "vol-0832e27401b3e298c",
+            "ResourceType": "AWS::EC2::Volume",
+            "LastUpdatedTimestamp": "2026-10-25T19:16:56.635000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "IN_SYNC"
+            }
+        }
+    ]
+}

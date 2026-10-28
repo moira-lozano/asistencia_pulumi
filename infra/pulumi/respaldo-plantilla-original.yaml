@@ -1,0 +1,264 @@
+---
+Metadata:
+  AWSToolsMetrics:
+    IaC_Generator: "arn:aws:cloudformation:us-east-1:036900132687:generatedTemplate/9cbfd30b-de3d-4676-b2a1-ffd20584edeb"
+Parameters:
+  KeyName:
+    Default: "CLAVES"
+    Type: "String"
+    Description: "Name of an existing EC2 KeyPair to enable SSH access"
+  KeyName2:
+    Default: "CLAVES"
+    Type: "String"
+    Description: "Name of an existing EC2 KeyPair to enable SSH access"
+Resources:
+  EC2VPCGatewayAttachmentIGW:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    DeletionPolicy: "Retain"
+    Properties:
+      InternetGatewayId: "igw-0ba81df8e3f386dc7"
+      VpcId: "vpc-060b642494b60df97"
+  EC2Instance:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::Instance"
+    DeletionPolicy: "Retain"
+    Properties:
+      Tenancy: "default"
+      PrivateIpAddress: "10.0.0.52"
+      MetadataOptions:
+        HttpPutResponseHopLimit: 2
+        HttpProtocolIpv6: "disabled"
+        HttpTokens: "required"
+        InstanceMetadataTags: "disabled"
+        HttpEndpoint: "enabled"
+      InstanceInitiatedShutdownBehavior: "stop"
+      BlockDeviceMappings:
+      - Ebs:
+          SnapshotId: "snap-0ffe259ee34f7697a"
+          VolumeType: "gp3"
+          Iops: 3000
+          VolumeSize: 8
+          Encrypted: false
+          DeleteOnTermination: true
+        DeviceName: "/dev/sda1"
+      PrivateDnsNameOptions:
+        EnableResourceNameDnsARecord: false
+        HostnameType: "ip-name"
+        EnableResourceNameDnsAAAARecord: false
+      SecurityGroupIds:
+      - "sg-0abee350eac1bd170"
+      EbsOptimized: true
+      DisableApiTermination: false
+      SourceDestCheck: true
+      PlacementGroupName: ""
+      NetworkInterfaces:
+      - Ipv6Addresses: []
+        SecondaryPrivateIpAddressCount: 0
+        NetworkInterfaceId: "eni-07a79681a002b4d4c"
+        DeviceIndex: "0"
+      ImageId: "ami-0b6d9d3d33ba97d99"
+      InstanceType: "t3.micro"
+      Monitoring: false
+      Tags:
+      - Value: "srv-front"
+        Key: "Name"
+      CreditSpecification:
+        CPUCredits: "unlimited"
+  EC2Volume:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::Volume"
+    DeletionPolicy: "Retain"
+    Properties:
+      MultiAttachEnabled: false
+      SnapshotId: "snap-0ffe259ee34f7697a"
+      VolumeType: "gp3"
+      Encrypted: false
+      Size: 8
+      AutoEnableIO: true
+      AvailabilityZoneId: "use1-az1"
+      AvailabilityZone: "us-east-1a"
+      Throughput: 125
+      Iops: 3000
+      Tags: []
+  EC2Subnet:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::Subnet"
+    DeletionPolicy: "Retain"
+    Properties:
+      MapPublicIpOnLaunch: false
+      EnableDns64: false
+      VpcId: "vpc-060b642494b60df97"
+      AvailabilityZoneId: "use1-az1"
+      PrivateDnsNameOptionsOnLaunch:
+        EnableResourceNameDnsARecord: false
+        HostnameType: "ip-name"
+        EnableResourceNameDnsAAAARecord: false
+      AvailabilityZone: "us-east-1a"
+      CidrBlock: "10.0.0.0/23"
+      Ipv6Native: false
+      Tags:
+      - Value: "sn-web-zona-a "
+        Key: "Name"
+  EC2SecurityGroup:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::SecurityGroup"
+    DeletionPolicy: "Retain"
+    Properties:
+      GroupDescription: "launch-wizard-4 created 2026-10-16T02:13:59.973Z"
+      GroupName: "launch-wizard-4"
+      VpcId: "vpc-060b642494b60df97"
+      SecurityGroupIngress:
+      - CidrIp: "0.0.0.0/0"
+        IpProtocol: "tcp"
+        FromPort: 80
+        ToPort: 80
+      - CidrIp: "189.28.75.151/32"
+        IpProtocol: "tcp"
+        FromPort: 22
+        ToPort: 22
+      - CidrIp: "0.0.0.0/0"
+        IpProtocol: "tcp"
+        FromPort: 443
+        ToPort: 443
+      SecurityGroupEgress:
+      - CidrIp: "0.0.0.0/0"
+        IpProtocol: "-1"
+  EC2Route:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::Route"
+    DeletionPolicy: "Retain"
+    Properties:
+      GatewayId: "igw-0ba81df8e3f386dc7"
+      RouteTableId: "rtb-01175623d75a29107"
+      DestinationCidrBlock: "0.0.0.0/0"
+  EC2VPC:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::VPC"
+    DeletionPolicy: "Retain"
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+      EnableDnsSupport: true
+      InstanceTenancy: "default"
+      EnableDnsHostnames: false
+      Tags:
+      - Value: "vpc-ecommerce-lab"
+        Key: "Name"
+  EC2VolumeAttachment:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::VolumeAttachment"
+    DeletionPolicy: "Retain"
+    Properties:
+      VolumeId: "vol-00322829908d4c008"
+      InstanceId: "i-021e80f0aada3727b"
+      Device: "/dev/sda1"
+      EbsCardIndex: 0
+  EC2RouteTable:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::RouteTable"
+    DeletionPolicy: "Retain"
+    Properties:
+      VpcId: "vpc-060b642494b60df97"
+      Tags:
+      - Value: "rt-publica-ecommerce"
+        Key: "Name"
+  EC2VolumeOU:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::Volume"
+    DeletionPolicy: "Retain"
+    Properties:
+      MultiAttachEnabled: false
+      SnapshotId: "snap-0ffe259ee34f7697a"
+      VolumeType: "gp3"
+      Encrypted: false
+      Size: 8
+      AutoEnableIO: true
+      AvailabilityZoneId: "use1-az1"
+      AvailabilityZone: "us-east-1a"
+      Throughput: 125
+      Iops: 3000
+      Tags: []
+  EC2InternetGateway:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::InternetGateway"
+    DeletionPolicy: "Retain"
+    Properties:
+      Tags:
+      - Value: "igw-ecommerce"
+        Key: "Name"
+  EC2SecurityGroupCR:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::SecurityGroup"
+    DeletionPolicy: "Retain"
+    Properties:
+      GroupDescription: "launch-wizard-3 created 2026-10-16T02:09:28.917Z"
+      GroupName: "launch-wizard-3"
+      VpcId: "vpc-060b642494b60df97"
+      SecurityGroupIngress:
+      - CidrIp: "189.28.75.151/32"
+        IpProtocol: "tcp"
+        FromPort: 22
+        ToPort: 22
+      - CidrIp: "0.0.0.0/0"
+        IpProtocol: "tcp"
+        FromPort: 8090
+        ToPort: 8090
+      SecurityGroupEgress:
+      - CidrIp: "0.0.0.0/0"
+        IpProtocol: "-1"
+  EC2VolumeAttachmentCf:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::VolumeAttachment"
+    DeletionPolicy: "Retain"
+    Properties:
+      VolumeId: "vol-0832e27401b3e298c"
+      InstanceId: "i-0709dc12e57c36214"
+      Device: "/dev/sda1"
+      EbsCardIndex: 0
+  EC2InstanceJT:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::Instance"
+    DeletionPolicy: "Retain"
+    Properties:
+      Tenancy: "default"
+      PrivateIpAddress: "10.0.1.134"
+      MetadataOptions:
+        HttpPutResponseHopLimit: 2
+        HttpProtocolIpv6: "disabled"
+        HttpTokens: "required"
+        InstanceMetadataTags: "disabled"
+        HttpEndpoint: "enabled"
+      InstanceInitiatedShutdownBehavior: "stop"
+      BlockDeviceMappings:
+      - Ebs:
+          SnapshotId: "snap-0ffe259ee34f7697a"
+          VolumeType: "gp3"
+          Iops: 3000
+          VolumeSize: 8
+          Encrypted: false
+          DeleteOnTermination: true
+        DeviceName: "/dev/sda1"
+      PrivateDnsNameOptions:
+        EnableResourceNameDnsARecord: false
+        HostnameType: "ip-name"
+        EnableResourceNameDnsAAAARecord: false
+      SecurityGroupIds:
+      - "sg-0c8c28f2beda67529"
+      EbsOptimized: true
+      DisableApiTermination: false
+      SourceDestCheck: true
+      PlacementGroupName: ""
+      NetworkInterfaces:
+      - Ipv6Addresses: []
+        SecondaryPrivateIpAddressCount: 0
+        NetworkInterfaceId: "eni-0958a36a2cf66b254"
+        DeviceIndex: "0"
+      ImageId: "ami-0b6d9d3d33ba97d99"
+      InstanceType: "t3.micro"
+      Monitoring: false
+      Tags:
+      - Value: "srv-back"
+        Key: "Name"
+      CreditSpecification:
+        CPUCredits: "unlimited"
+

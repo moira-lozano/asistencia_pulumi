@@ -1,0 +1,22 @@
+[
+  {
+    "Source": {
+      "StackName": "asistencia-importacion",
+      "LogicalResourceId": "EC2VPC"
+    },
+    "Destination": {
+      "StackName": "asistencia-red",
+      "LogicalResourceId": "AsistenciaVPC"
+    }
+  },
+  {
+    "Source": {
+      "StackName": "asistencia-importacion",
+      "LogicalResourceId": "EC2Subnet"
+    },
+    "Destination": {
+      "StackName": "asistencia-red",
+      "LogicalResourceId": "AsistenciaSubnet"
+    }
+  }
+]

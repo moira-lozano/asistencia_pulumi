@@ -1,6 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Referencias a los grupos de seguridad existentes
 
+Parameters:
+  VpcId: { Type: String }
+  SshCidr: { Type: String }
+
 Resources:
   Referencia:
     Type: AWS::CloudFormation::WaitConditionHandle
